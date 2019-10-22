@@ -23,7 +23,7 @@ def run_tests(verbose):
                'bool': True}
     dtypes = pdarrays.keys()
     if verbose:
-        print("Operators: ", ak.BinOps)
+        print("Operators: ", ak.pdarray.BinOps)
         print("Dtypes: ", dtypes)
         print("pdarrays: ")
         for k, v in pdarrays.items():
@@ -69,6 +69,7 @@ def run_tests(verbose):
                         results['neither_implement'].append((expression, str(e)))
                     else: # arkouda implements with error, np does not implement
                         results['arkouda_minus_numpy'].append((expression, str(e), True))
+                    continue
                 # arkouda implements but not numpy
                 results['arkouda_minus_numpy'].append((expression, str(akres), False))
                 continue
