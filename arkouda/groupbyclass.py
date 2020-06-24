@@ -485,10 +485,4 @@ class GroupBy:
         diffs = concatenate((array([values[0]]), values[1:] - values[:-1]))
         temp[self.segments] = diffs
         return cumsum(temp)
-
-# def to_pdgb(arrayList, pdarray):
-
-#     valList = [index.to_ndarray() for index in arrayList]
-#     Tval = np.array(valList).T
-#     index = pd.MultiIndex.from_tuples(list(map(tuple, Tval)))
-#     return pd.DataFrame(pda.to_ndarray(), index = index)     
+ 
