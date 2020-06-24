@@ -264,7 +264,7 @@ module ReductionMsg
       // 'values_name' is the segmented array of values to be reduced
       // 'segments_name' is the sement offsets
       // 'operator' is the reduction operator
-      var (cmd, values_name, segments_name, operator) = reqMsg.splitMsgToTuple(4);
+      var (cmd, values_name, segments_name, operator, ignore_nan) = reqMsg.splitMsgToTuple(5);
       var rname = st.nextName();
       if v {try! writeln("%s %s %s %s".format(cmd,values_name,segments_name,operator));try! stdout.flush();}
       var gVal: borrowed GenSymEntry = st.lookup(values_name);
@@ -276,7 +276,7 @@ module ReductionMsg
         var values = toSymEntry(gVal, int);
         select operator {
           when "sum" {
-            var res = segSum(values.a, segments.a);
+            var res = segSum(values.a, segments.a, "False");  
             st.addEntry(rname, new shared SymEntry(res));
           }
           when "prod" {
@@ -284,15 +284,15 @@ module ReductionMsg
             st.addEntry(rname, new shared SymEntry(res));
           }
           when "mean" {
-            var res = segMean(values.a, segments.a);
+            var res = segMean(values.a, segments.a, "False");
             st.addEntry(rname, new shared SymEntry(res));
           }
           when "min" {
-            var res = segMin(values.a, segments.a);
+            var res = segMin(values.a, segments.a, "False");
             st.addEntry(rname, new shared SymEntry(res));
           }
           when "max" {
-            var res = segMax(values.a, segments.a);
+            var res = segMax(values.a, segments.a, "False");
             st.addEntry(rname, new shared SymEntry(res));
           }
           when "argmin" {
@@ -314,7 +314,13 @@ module ReductionMsg
         var values = toSymEntry(gVal, real);
         select operator {
           when "sum" {
-            var res = segSum(values.a, segments.a);
+            var res;
+            if (ignore_nan == "True") {
+              res = segSum(values.a, segments.a);
+            } else {
+              res = segSum(values.a, segments.a, "False");
+            }
+
             st.addEntry(rname, new shared SymEntry(res));
           }
           when "prod" {
@@ -322,15 +328,30 @@ module ReductionMsg
             st.addEntry(rname, new shared SymEntry(res));
           }
           when "mean" {
-            var res = segMean(values.a, segments.a);
+            var res;
+            if (ignore_nan == "True") {
+              res = segMean(values.a, segments.a);
+            } else {
+              res = segMean(values.a, segments.a, "False");
+            }
             st.addEntry(rname, new shared SymEntry(res));
           }
           when "min" {
-            var res = segMin(values.a, segments.a);
+            var res;
+            if (ignore_nan == "True") {
+              res = segMin(values.a, segments.a);
+            } else {
+              res = segMin(values.a, segments.a, "False");
+            }
             st.addEntry(rname, new shared SymEntry(res));
           }
           when "max" {
-            var res = segMax(values.a, segments.a);
+            var res;
+            if (ignore_nan == "True") {
+              res = segMax(values.a, segments.a);
+            } else {
+              res = segMax(values.a, segments.a, "False");
+            }
             st.addEntry(rname, new shared SymEntry(res));
           }
           when "argmin" {
@@ -360,7 +381,7 @@ module ReductionMsg
             st.addEntry(rname, new shared SymEntry(res));
           }
           when "mean" {
-            var res = segMean(values.a, segments.a);
+            var res = segMean(values.a, segments.a, "False");
             st.addEntry(rname, new shared SymEntry(res));
           }
           otherwise {return notImplementedError(pn,operator,gVal.dtype);}
@@ -377,7 +398,7 @@ module ReductionMsg
       // 'values_name' is the segmented array of values to be reduced
       // 'segments_name' is the segmented offsets
       // 'operator' is the reduction operator
-      var (cmd, keys_name, values_name, segments_name, operator) = reqMsg.splitMsgToTuple(5);
+      var (cmd, keys_name, values_name, segments_name, operator, ignore_nan) = reqMsg.splitMsgToTuple(6);
       var rname = st.nextName();
       if v {try! writeln("%s %s %s %s %s".format(cmd,keys_name,values_name,segments_name,operator));try! stdout.flush();}
 
@@ -393,7 +414,7 @@ module ReductionMsg
         var values = toSymEntry(gVal, int);
         select operator {
           when "sum" {
-            var res = perLocSum(values.a, segments.a);
+            var res = perLocSum(values.a, segments.a, "False");
             st.addEntry(rname, new shared SymEntry(res));
           }
           when "prod" {
@@ -401,15 +422,15 @@ module ReductionMsg
             st.addEntry(rname, new shared SymEntry(res));
           }
           when "mean" {
-            var res = perLocMean(values.a, segments.a);
+            var res = perLocMean(values.a, segments.a, "False");
             st.addEntry(rname, new shared SymEntry(res));
           }
           when "min" {
-            var res = perLocMin(values.a, segments.a);
+            var res = perLocMin(values.a, segments.a, "False");
             st.addEntry(rname, new shared SymEntry(res));
           }
           when "max" {
-            var res = perLocMax(values.a, segments.a);
+            var res = perLocMax(values.a, segments.a, "False");
             st.addEntry(rname, new shared SymEntry(res));
           }
           when "argmin" {
@@ -431,7 +452,12 @@ module ReductionMsg
         var values = toSymEntry(gVal, real);
         select operator {
           when "sum" {
-            var res = perLocSum(values.a, segments.a);
+            var res;
+            if (ignore_nan == "True") {
+              res = perLocSum(values.a, segments.a);
+            } else {
+              res = perLocSum(values.a, segments.a, "False");
+            }
             st.addEntry(rname, new shared SymEntry(res));
           }
           when "prod" {
@@ -439,15 +465,30 @@ module ReductionMsg
             st.addEntry(rname, new shared SymEntry(res));
           }
           when "mean" {
-            var res = perLocMean(values.a, segments.a);
+            var res;
+            if (ignore_nan == "True") {
+              res = perLocMean(values.a, segments.a);
+            } else {
+              res = perLocMean(values.a, segments.a, "False");
+            }
             st.addEntry(rname, new shared SymEntry(res));
           }
           when "min" {
-            var res = perLocMin(values.a, segments.a);
+            var res;
+            if (ignore_nan == "True") {
+              res = perLocMin(values.a, segments.a);
+            } else {
+              res = perLocMin(values.a, segments.a, "False");
+            }
             st.addEntry(rname, new shared SymEntry(res));
           }
           when "max" {
-            var res = perLocMax(values.a, segments.a);
+            var res;
+            if (ignore_nan == "True") {
+              res = perLocMax(values.a, segments.a);
+            } else {
+              res = perLocMax(values.a, segments.a, "False");
+            }
             st.addEntry(rname, new shared SymEntry(res));
           }
           when "argmin" {
@@ -477,7 +518,7 @@ module ReductionMsg
             st.addEntry(rname, new shared SymEntry(res));
           }
           when "mean" {
-            var res = perLocMean(values.a, segments.a);
+            var res = perLocMean(values.a, segments.a, "False");
             st.addEntry(rname, new shared SymEntry(res));
           }
           otherwise {return notImplementedError(pn,operator,gVal.dtype);}
@@ -493,10 +534,16 @@ module ReductionMsg
        and then reduce over each chunk uisng the operator <Op>. The return array 
        of reduced values is the same size as <segments>.
      */
-    proc segSum(values:[] ?t, segments:[?D] int): [D] t {
+    proc segSum(values:[] ?t, segments:[?D] int, param ignoreNan = "True"): [D] t {
       var res: [D] t;
       if (D.size == 0) { return res; }
-      var cumsum = + scan values;
+      var cumsum;
+      if (ignoreNan == "True") {
+        var noNan = [elem in values] if isnan(elem) then 0.0 else elem;
+        cumsum = + scan noNan;
+      } else {
+         cumsum = + scan values;
+      }
       // Iterate over segments
       forall (i, r) in zip(D, res) {
         // Find the segment boundaries
@@ -523,7 +570,7 @@ module ReductionMsg
        to seg<Op> on the local slice of values) and a global reduction of the 
        local results. The return is the same as seg<Op>: one reduced value per segment.
     */
-    proc perLocSum(values:[] ?t, segments:[?D] int): [] t {
+    proc perLocSum(values:[] ?t, segments:[?D] int, param ignoreNan = "True"): [] t {
       // Infer the number of keys from size of <segments>
       var numKeys:int = segments.size / numLocales;
       // Make the distributed domain of the final result
@@ -533,8 +580,14 @@ module ReductionMsg
       coforall loc in Locales {
         on loc {
           // Each locale reduces its local slice of <values>
-          perLocVals[here.id] = segSum(values.localSlice[values.localSubdomain()],
-                                       segments.localSlice[D.localSubdomain()]);
+          if (ignoreNan == "True") {
+           perLocVals[here.id] = segSum(values.localSlice[values.localSubdomain()],
+                                      segments.localSlice[D.localSubdomain()]);
+         } else {
+           perLocVals[here.id] = segSum(values.localSlice[values.localSubdomain()],
+                                      segments.localSlice[D.localSubdomain()], "False");
+         }
+
         }
       }
       // The global result is a distributed array, computed as a vector reduction over local results
@@ -611,7 +664,7 @@ module ReductionMsg
       return res;
     }
     
-    proc segMean(values:[] ?t, segments:[?D] int): [D] real {
+    proc segMean(values:[] ?t, segments:[?D] int, param ignoreNan = "True"): [D] real {
       var res: [D] real;
       if (D.size == 0) { return res; }
       var sums = segSum(values, segments);
@@ -640,18 +693,24 @@ module ReductionMsg
       return res;
     }
 
-    proc perLocMean(values:[] ?t, segments:[?D] int): [] real {
+    proc perLocMean(values:[] ?t, segments:[?D] int, param ignoreNan = "True"): [] real {
       var numKeys:int = segments.size / numLocales;
       var keyCounts = perLocCount(segments, values.size);
       var res = perLocSum(values, segments);
       return res:real / keyCounts:real;
     }
 
-    proc segMin(values:[?vD] ?t, segments:[?D] int): [D] t {
+    proc segMin(values:[?vD] ?t, segments:[?D] int, param ignoreNan = "True"): [D] t {
       var res: [D] t = max(t);
       if (D.size == 0) { return res; }
       var keys = expandKeys(vD, segments);
-      var kv = [(k, v) in zip(keys, values)] (-k, v);
+      var kv;
+      if (ignoreNan == "True") {
+         var valCopy = [elem in values] if isnan(elem) then max(t) else elem;
+        kv = [(k, v) in zip(keys, valCopy)] (-k, v);
+      } else {
+         kv = [(k, v) in zip(keys, values)] (-k, v);
+      }
       var cummin = min scan kv;
       forall (i, r, low) in zip(D, res, segments) {
         var vi: int;
@@ -667,14 +726,20 @@ module ReductionMsg
       return res;
     }
     
-    proc perLocMin(values:[] ?t, segments:[?D] int): [] t {
+    proc perLocMin(values:[] ?t, segments:[?D] int, param ignoreNan = "True"): [] t {
       var numKeys:int = segments.size / numLocales;
       var keyDom = makeDistDom(numKeys);
       var perLocVals: [PrivateSpace] [0..#numKeys] t;
       coforall loc in Locales {
         on loc {
-          perLocVals[here.id] = segMin(values.localSlice[values.localSubdomain()],
-                                       segments.localSlice[D.localSubdomain()]);
+          if (ignoreNan == "True") {
+            perLocVals[here.id] = segMin(values.localSlice[values.localSubdomain()],
+                                      segments.localSlice[D.localSubdomain()]);
+          } else {
+            perLocVals[here.id] = segMin(values.localSlice[values.localSubdomain()],
+                                      segments.localSlice[D.localSubdomain()], "False");
+         }
+
         }
       }
       var res: [keyDom] t;
@@ -684,11 +749,17 @@ module ReductionMsg
       return res;
     }    
 
-    proc segMax(values:[?vD] ?t, segments:[?D] int): [D] t {
+    proc segMax(values:[?vD] ?t, segments:[?D] int, param ignoreNan = "True"): [D] t {
       var res: [D] t = min(t);
       if (D.size == 0) { return res; }
       var keys = expandKeys(vD, segments);
-      var kv = [(k, v) in zip(keys, values)] (k, v);
+      var kv;
+      if (ignoreNan == "True") {
+        var valCopy = [elem in values] if isnan(elem) then min(t) else elem;
+        kv = [(k, v) in zip(keys, valCopy)] (k, v);
+      } else {
+        kv = [(k, v) in zip(keys, values)] (k, v);
+      }
       var cummax = max scan kv;
       forall (i, r, low) in zip(D, res, segments) {
         var vi: int;
@@ -704,14 +775,19 @@ module ReductionMsg
       return res;
     }
 
-    proc perLocMax(values:[] ?t, segments:[?D] int): [] t {
+    proc perLocMax(values:[] ?t, segments:[?D] int, param ignoreNan = "True"): [] t {
       var numKeys:int = segments.size / numLocales;
       var keyDom = makeDistDom(numKeys);
       var perLocVals: [PrivateSpace] [0..#numKeys] t;
       coforall loc in Locales {
         on loc {
-          perLocVals[here.id] = segMax(values.localSlice[values.localSubdomain()],
-                                       segments.localSlice[D.localSubdomain()]);
+          if (ignoreNan == "True") {
+            perLocVals[here.id] = segMax(values.localSlice[values.localSubdomain()],
+                                      segments.localSlice[D.localSubdomain()]);
+          } else {
+            perLocVals[here.id] = segMax(values.localSlice[values.localSubdomain()],
+                                      segments.localSlice[D.localSubdomain()], "False");
+         }
         }
       }
       var res: [keyDom] t;

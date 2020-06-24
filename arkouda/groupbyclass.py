@@ -159,7 +159,7 @@ class GroupBy:
         if verbose: print(repMsg)
         return self.unique_keys, create_pdarray(repMsg)
         
-    def aggregate(self, values, operator):
+    def aggregate(self, values, operator, ignore_nan = True):
         '''
         Using the permutation stored in the GroupBy instance, group another array 
         of values and apply a reduction to each group's values. 
@@ -193,10 +193,11 @@ class GroupBy:
             cmd = "segmentedLocalRdx"
         else:
             cmd = "segmentedReduction"
-        reqMsg = "{} {} {} {}".format(cmd,
+        reqMsg = "{} {} {} {} {}".format(cmd,
                                          permuted_values.name,
                                          self.segments.name,
-                                         operator)
+                                         operator, 
+                                         ignore_nan)
         repMsg = generic_msg(reqMsg)
         if verbose: print(repMsg)
         if operator.startswith('arg'):
@@ -204,7 +205,7 @@ class GroupBy:
         else:
             return self.unique_keys, create_pdarray(repMsg)
 
-    def sum(self, values):
+    def sum(self, values, ignore_nan = True):
         """
         Using the permutation stored in the GroupBy instance, group another array 
         of values and sum each group's values. 
@@ -225,7 +226,7 @@ class GroupBy:
         -----
         The grouped sum of a boolean ``pdarray`` returns integers.
         """
-        return self.aggregate(values, "sum")
+        return self.aggregate(values, "sum", ignore_nan)
     
     def prod(self, values):
         """
@@ -250,7 +251,7 @@ class GroupBy:
         """
         return self.aggregate(values, "prod")
     
-    def mean(self, values):
+    def mean(self, values, ignore_nan = True):
         """
         Using the permutation stored in the GroupBy instance, group another array 
         of values and compute the mean of each group's values. 
@@ -271,9 +272,9 @@ class GroupBy:
         -----
         The return dtype is always float64.
         """
-        return self.aggregate(values, "mean")
+        return self.aggregate(values, "mean", ignore_nan)
     
-    def min(self, values):
+    def min(self, values, ignore_nan = True):
         """
         Using the permutation stored in the GroupBy instance, group another array 
         of values and return the minimum of each group's values. 
@@ -291,9 +292,9 @@ class GroupBy:
             One minimum per unique key in the GroupBy instance
 
         """
-        return self.aggregate(values, "min")
+        return self.aggregate(values, "min", ignore_nan)
     
-    def max(self, values):
+    def max(self, values, ignore_nan = True):
         """
         Using the permutation stored in the GroupBy instance, group another array 
         of values and return the maximum of each group's values. 
@@ -311,7 +312,7 @@ class GroupBy:
             One maximum per unique key in the GroupBy instance
 
         """
-        return self.aggregate(values, "max")
+        return self.aggregate(values, "max", ignore_nan)
     
     def argmin(self, values):
         """
