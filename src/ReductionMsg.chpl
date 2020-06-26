@@ -667,8 +667,21 @@ module ReductionMsg
     proc segMean(values:[] ?t, segments:[?D] int, param ignoreNan = "True"): [D] real {
       var res: [D] real;
       if (D.size == 0) { return res; }
+      var nancounts = makeDistArray(segments.size, int);
+      // where we are in segments/nancounts
+      var j = 0;
+      if (ignoreNan == "True") {
+        for i in 0..#values.size {
+          if (j != segments.size - 1 && i >= segments[j+1]) {
+            j += 1;
+          }
+          if isnan(values[i]) {
+            nancounts[j] += 1;
+          }
+        }
+      }
       var sums = segSum(values, segments);
-      var counts = segCount(segments, values.size);
+      var counts = segCount(segments, values.size) - nancounts;
       forall (r, s, c) in zip(res, sums, counts) {
         if (c > 0) {
           r = s:real / c:real;
